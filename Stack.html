@@ -115,24 +115,27 @@
         updateCart();
     }
 
-    function orderNow() {
+function orderNow() {
 
-        fetch("http://localhost:3000/order", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                items: cart,
-                total: total
-            })
+    fetch("https://mizhi-backend.onrender.com/order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            items: cart,
+            total: total
         })
-        .then(response => response.json())
-        .then(data => {
-            alert("订单发送成功！");
-            console.log(data);
-        });
-    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("订单发送成功！");
+        console.log(data);
+    })
+    .catch(error => {
+        console.error("错误:", error);
+    });
+}
 </script>
 
 </body>
