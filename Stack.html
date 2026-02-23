@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>蜜汁小餐厅</title>
+    <style>
+        body {
+            background-color: white;
+            font-family: Arial;
+        }
+
+        h1 {
+            color: black;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: red;
+        }
+
+        p {
+            color: black;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>欢迎来到蜜汁小餐厅</h1>
+
+    <h2>炒菜</h2>
+
+    <div class = "menu-item">
+        <span>红烧肉</span>
+        <span>20 元</span>
+        <button onclick="addToCart('红烧肉', 20)">添加</button>
+    </div>
+
+    <div class = "menu-item">
+        <span>宫保鸡丁</span>
+        <span>15 元</span>
+        <button onclick="addToCart('宫保鸡丁', 15)">添加</button>
+    </div>
+
+    <h3>主食</h3>
+
+    <div class = "menu-item">
+        <span>米饭</span>
+        <span>2元</span>
+        <button onclick="addToCart('米饭', 2)">添加</button>
+    </div>
+
+    <div class = "menu-item">
+        <span>面条</span>
+        <span>2元</span>
+        <button onclick="addToCart('面条', 2)">添加</button>
+    </div>
+
+    <h5>购物车</h5>
+    <ul id = "cart-list"></ul>
+    <h5>总价: <span id = "total">0</span> 元</h5>
+
+    <button onclick="orderNow()">Order Now</button>
+<script>
+    let cart = {}
+    let total = 0;
+    function addToCart(name, price) {
+        if (cart[name]) {
+            cart[name].quantity += 1;
+        } else {
+            cart[name] = {
+                price: price,
+                quantity: 1
+            };
+        }
+        updateCart();
+    }
+
+    function updateCart() {
+        let cartList = document.getElementById("cart-list");
+        cartList.innerHTML = "";
+
+        total = 0;
+
+        for (let item in cart) {
+            let li = document.createElement("li");
+
+            let quantity = cart[item].quantity;
+            let price = cart[item].price;
+
+            total += quantity * price;
+
+            li.innerHTML = `
+                ${item} x ${quantity} = ${quantity * price} 元
+                <button onclick="decreaseItem('${item}')">-</button>
+            `;
+
+            cartList.appendChild(li);
+        }
+
+        document.getElementById("total").innerText = total;
+    }
+
+    function decreaseItem(name) {
+        if (cart[name]) {
+            cart[name].quantity -= 1;
+        }
+        if (cart[name].quantity <= 0) {
+            delete cart[name];
+        }
+        updateCart();
+    }
+
+    function orderNow() {
+
+        fetch("http://localhost:3000/order", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                items: cart,
+                total: total
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("订单发送成功！");
+            console.log(data);
+        });
+    }
+</script>
+
+</body>
+</html>
